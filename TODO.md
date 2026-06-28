@@ -6,11 +6,12 @@ Oh the irony...
 
 [] List out requirement/assumptions/objective in the README
 [] README initial content
-    [] Objective
-    [] Requirements
-    [] User stories
+    [X] Objective
+    [X] Requirements
+    [X] User stories
     [] Assumptions
     [] Key considerations & decisions
+    [] Dev setup
     [] High-level Approach
     [] Repo Structure
     [] Branching Strategy
@@ -23,6 +24,10 @@ Oh the irony...
     [] Backend high-level design/laying out rough components
     [] Frontend high-level design/laying out rough components
 [] Fill in .gitignore with common ignore patterns for tech stack
+[] Implementation
+    [] Frontend
+    [] Backend
+[] Testing
 
 ### POST-MVP
 
@@ -34,9 +39,13 @@ Oh the irony...
     [] ToDo groups/divisions
     [] User groups
     [] Permissions management for ToDos and ToDo groups across multiple users/user groups
+[] Deployment automation
+    [] IaC deployment
 [] Resiliency
     [] Persistent DB & replication strategies
-[] Long-term scalability and regional optimizations
+[] Long-term scalability and regionality
     [] Load balancing across multiple server instances
+    [] Caching and edge servers
+    [] Regional data segregation (GDPR compliance)
 [] Additional integrations/form factors
     [] MCP APIs for agent usability
