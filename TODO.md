@@ -46,6 +46,5 @@ Oh the irony...
 [] Long-term scalability and regionality
     [] Load balancing across multiple server instances
     [] Caching and edge servers
-    [] Regional data segregation (GDPR compliance)
 [] Additional integrations/form factors
     [] MCP APIs for agent usability
