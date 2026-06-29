@@ -74,15 +74,35 @@ Requirements are be derived primarily from the user stories above.
 |**NFR5**|Latency|API requests should always take < 250ms.|
 |**NFR6**|Data Segregation|ToDos can only be viewed and updated by authorized individuals *(MVP: creator only)*.|
 |**NFR7**|Horizontal Scalability|Sharding/some distribution strategy should be supported so that horizontal scaling is possible.|
+|**NFR8**|Multi-language Support|Support characters beyond standard ASCII for multi-language support.|
+
+### Assumptions & Scale
+
+Assumptions about the service:
+- The service will be maintained for 10 years (120 months)
+
+Assumptions about users:
+- Users may prefer languages other than English that include special characters not representable with ASCII
+- No user will create more than 2^20 (1,048,576) ToDos in throughout their lifetime use of the service
+- Across the lifetime of the service itself, there will be no more than 2^28 (268,435,456) total users
+- Each user on average will not submit more than 2^8 (256) requests per day
+- Daily active users will not exceed 30% of monthly active users
+- Peak monthly active users will not exceed 2^24 (16,777,216) users
+
+As a result:
+- Peak daily active users will not exceed 5,033,165 (2^24 * 0.3)
+- Peak requests per second will not exceed 59 (2^24 * 0.3 / (60 * 60 * 24))
+- No more than 2^48 (2^20 * 2^28 = 281,474,976,710,656) ToDos will be created throughout the lifetime of the service
+
+*Note: These numbers may seem large for a simple ToDo application. They probably are, but you really don't want to run out of ID space, so better safe than sorry with these calculations.*
 
 ### Key Considerations & Decisions
 
+String representation:
+
+
 ...
 Remember: Security/Escaping content
-...
-
-### Assumptions
-
 ...
 
 ### High-level Approach

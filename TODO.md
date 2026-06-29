@@ -9,7 +9,7 @@ Oh the irony...
     [X] Objective
     [X] Requirements
     [X] User stories
-    [] Assumptions
+    [X] Assumptions
     [] Key considerations & decisions
     [] Dev setup
     [] High-level Approach
@@ -17,8 +17,7 @@ Oh the irony...
     [] Branching Strategy
     [X] AI use disclosure
 [] DESIGN initial content
-    [] Frontend framework choice
-    [] Enumerate any frontend functionalities and user patterns
+    [X] Frontend framework choice
     [] Data structures
     [] APIs & API shapes
     [] Backend high-level design/laying out rough components
