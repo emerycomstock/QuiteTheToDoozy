@@ -110,6 +110,7 @@ Assumptions about the service:
 Assumptions about users:
 - Users may prefer languages other than English that include special characters not representable with ASCII
 - Users will create on average 2^10 (1024) ToDos throughout their lifetime use of the service
+- Users will not create more than 1,000,000 ToDos throughout their lifetime use of the service
 - Across the lifetime of the service itself, there will be no more than 2^24 (16,777,216) total users
 - Each user will submit an average of 2^5 (32) requests per day
 - Daily active users will not exceed 30% of monthly active users
