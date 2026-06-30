@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Identity;
 using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 using ToDoozy.Server.Data;
@@ -17,6 +18,13 @@ builder.Services.AddDbContext<ToDoozyDbContext>(options =>
     options.UseSqlite(keepAliveConnection);
 });
 
+// Add built-in AuthN/AuthZ services with JWT
+builder.Services.AddAuthorization();
+builder.Services.AddAuthentication().AddJwtBearer();
+builder.Services.AddIdentityCore<IdentityUser>()
+    .AddEntityFrameworkStores<ToDoozyDbContext>()
+    .AddApiEndpoints();
+
 // TODO: Add ToDo service once it's created -> builder.Services.AddScoped<IToDoService, ToDoService>();
 
 var app = builder.Build();
@@ -34,18 +42,22 @@ using (var scope = app.Services.CreateScope())
     dbContext.Database.EnsureCreated();
 }
 
-// HTTPS Redirect Middleware
+// Use default routing middleware
+app.UseRouting();
+// Use default HTTPS redirect middleware
 app.UseHttpsRedirection();
+// Use default AuthN/AuthZ middleware
+app.UseAuthentication();
+app.UseAuthorization();
 
-// Map user/auth handlers
-app.MapPost("/user", UserHandlers.CreateUser).WithName("CreateUser");
-app.MapPost("/login", UserHandlers.Login).WithName("Login");
+// Map default handlers for /refresh /login /register
+app.MapIdentityApi<IdentityUser>();
 
-// Map ToDo handlers
-app.MapGet("/todo", ToDoHandlers.ListToDos).WithName("ListToDos");
-app.MapGet("/todo/{id}", ToDoHandlers.GetToDoById).WithName("GetToDo");
-app.MapPost("/todo", ToDoHandlers.CreateToDo).WithName("CreateToDo");
-app.MapPatch("/todo/{id}", ToDoHandlers.UpdateToDo).WithName("UpdateToDo");
-app.MapDelete("/todo/{id}", ToDoHandlers.DeleteToDo).WithName("DeleteToDo");
+// Map ToDo handlers (require auth)
+app.MapGet("/todo", ToDoHandlers.ListToDos).WithName("ListToDos").RequireAuthorization();
+app.MapGet("/todo/{id}", ToDoHandlers.GetToDoById).WithName("GetToDo").RequireAuthorization();
+app.MapPost("/todo", ToDoHandlers.CreateToDo).WithName("CreateToDo").RequireAuthorization();
+app.MapPatch("/todo/{id}", ToDoHandlers.UpdateToDo).WithName("UpdateToDo").RequireAuthorization();
+app.MapDelete("/todo/{id}", ToDoHandlers.DeleteToDo).WithName("DeleteToDo").RequireAuthorization();
 
 app.Run();
