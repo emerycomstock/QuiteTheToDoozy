@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 using ToDoozy.Server.Data;
+using ToDoozy.Server.Data.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -20,12 +21,19 @@ builder.Services.AddDbContext<ToDoozyDbContext>(options =>
 
 // Add built-in AuthN/AuthZ services with JWT
 builder.Services.AddAuthorization();
-builder.Services.AddAuthentication().AddJwtBearer();
+builder.Services
+    .AddAuthentication(options =>
+    {
+        options.DefaultAuthenticateScheme = IdentityConstants.BearerScheme;
+        options.DefaultChallengeScheme = IdentityConstants.BearerScheme;
+    })
+    .AddBearerToken(IdentityConstants.BearerScheme);
 builder.Services.AddIdentityCore<IdentityUser<int>>()
     .AddEntityFrameworkStores<ToDoozyDbContext>()
     .AddApiEndpoints();
 
-// TODO: Add ToDo service once it's created -> builder.Services.AddScoped<IToDoService, ToDoService>();
+// Add ToDo service
+builder.Services.AddScoped<IToDoService, ToDoService>();
 
 var app = builder.Build();
 

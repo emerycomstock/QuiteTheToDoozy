@@ -1,6 +1,43 @@
-@ToDoozy.Server.API_HostAddress = http://localhost:5087
+@hostname = localhost
+@port_insecure = 5087
+@port_secure = 7081
+@host_insecure = http://{{hostname}}:{{port_insecure}}
+@host_secure = https://{{hostname}}:{{port_secure}}
+@accept = application/json
+@contentType = application/json
 
-GET {{ToDoozy.Server.API_HostAddress}}/weatherforecast/
-Accept: application/json
+### Register a New User
+
+POST {{host_secure}}/register
+Content-Type: {{contentType}}
+
+{
+  "email": "testuser@example.com",
+  "password": "Password123!"
+}
+
+###
+
+### Login to Retrieve Token
+
+# @name loginRequest
+POST {{host_secure}}/login
+Content-Type: {{contentType}}
+Accept: {{accept}}
+
+{
+  "email": "testuser@example.com",
+  "password": "Password123!"
+}
+
+###
+
+### Refresh Token Session
+POST {{host_secure}}/refresh
+Content-Type: {{contentType}}
+
+{
+  "refreshToken": "{{loginRequest.response.body.$.refreshToken}}"
+}
 
 ###
