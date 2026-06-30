@@ -6,7 +6,7 @@
 
 This is an application for creating, viewing, and managing a collection of ToDo tasks. It will consist of both a backend API written in ASP.NET and a frontend written in Vue.
 
-This service will *obviously* be *widely popular* and must scale to large loads and the expectations of its ferociously loyal customers, but the initial MVP will provide only basic functionalities and be capable of supporting the approximate lifetime average load. Additional infrastructure will be required to scale up to support expected lifetime peak loads defined below.
+This service will *obviously* be *widely popular* and must scale to large loads and the expectations of its ferociously loyal customers, but the initial MVP will provide only basic functionalities and be capable of supporting the approximate lifetime average load. Additional infrastructure will later be required to scale up to support expected lifetime storage requirements or lifetime peak loads.
 
 For the MVP phase of this project:
 - We will define a "ToDo" as a task with a title and an optional description. The ToDo will be in one of a handful of states: "Not Started", "In Progress", "Completed", or "Abandoned".
@@ -110,34 +110,32 @@ Assumptions about the service:
 Assumptions about users:
 - Users may prefer languages other than English that include special characters not representable with ASCII
 - Users will create on average 2^10 (1024) ToDos throughout their lifetime use of the service
-- Across the lifetime of the service itself, there will be no more than 2^28 (268,435,456) total users
-- Each user will submit a maximum of 2^8 (256) requests per day and an average of 2^5 (32) requests per day
+- Across the lifetime of the service itself, there will be no more than 2^24 (16,777,216) total users
+- Each user will submit an average of 2^5 (32) requests per day
 - Daily active users will not exceed 30% of monthly active users
-- Peak monthly active users will on average be 2^20 (1,048,576) but will not exceed 2^24 (16,777,216) users
+- Peak monthly active users will on average be 2^20 (1,048,576)
 - Emails will exceed 256 characters (consuming 512 bytes/0.5KiB if unicode)
 - Passwords will be 256 character unicode strings when using ASP.NET Identity features (consuming 512 bytes/0.5KiB)
 
 Assumptions about ToDos:
 - Titles will require no more than 256 characters (512 bytes/0.5KiB if unicode)
-- Descriptions will require no more than 4096 characters (8192 bytes/8KiB if unicode)
+- Descriptions will require no more than 2048 characters (4096 bytes/4KiB if unicode)
 - Statuses will take a max of 1 byte (integer representation, assuming optimized integer storage)
 
 Assumptions about metadata:
 - Timestamps will consume 4 bytes (Unix timestamp consumes 4 bytes until 2038, after expected EoL of this service)
 
 As a result:
-- Peak daily active users will not exceed 5,033,165 (2^24 * 0.3)
-- Peak requests per second will on average be approximately 33,554,432 (2^20 * 2^5)
-- Peak daily requests will not exceed approximately 536,870,912 (2^24 * 2^5) 
-- Peak requests per second will on average be 117 ((2^24 * 2^5 * 0.3) / (60 * 60 * 24))
-- Peak requests per second will not exceed 1865 ((2^24 * 2^5 * 0.3) / (60 * 60 * 24))
-- No more than 2^38 (2^10 * 2^28 = 274,877,906,944) ToDos will be created throughout the lifetime of the service
+- Peak daily active users will not exceed 314,573 (2^20 * 0.3)
+- Peak daily requests will not exceed approximately 10,329,066 (2^20 * 2^5 * 0.3) 
+- Peak requests per second will on average be 117 ((2^20 * 2^5 * 0.3) / (60 * 60 * 24))
+- No more than 17,179,869,184 (2^10 * 2^24) ToDos will be created throughout the lifetime of the service
 - ToDo IDs will require no more than 5 bytes (integer representation, assuming optimized integer storage)
-- Each ToDo requires a maximum of ~8.5KiB (5 + 512 + 8192 + 1 + 4 + 4 = 8718 bytes) to store
+- Each ToDo requires a maximum of ~8.5KiB (5 + 512 + 4096 + 1 + 512 + 4 + 4 = 5134 bytes) to store
 - Each user requires a maximum of ~1KiB (512 + 512 + 4 + 4 = 1032 bytes) to store
-- Total ToDo storage required over service lifetime is at maximum 2.23 TiB (2^38 * 8718 bytes)
-- Total user storage required over service lifetime is at maximum 258 GiB (2^28 * 1032 bytes)
-- Total lifetime storage requirement is at maximum 2.48 TiB (2.23 TiB + 258 GiB)
+- Total ToDo storage required over service lifetime is at maximum ~146 TiB (2^34 * 9230 bytes)
+- Total user storage required over service lifetime is at maximum ~278 GiB (2^28 * 1032 bytes)
+- Total lifetime storage requirement is at maximum ~146 TiB ((2^34 * 9230 bytes) + (2^28 * 1032 bytes))
 
 *Note: These numbers may seem large for a simple ToDo application. They probably are, but you really don't want to run out of ID space, so better safe than sorry with these calculations.*
 

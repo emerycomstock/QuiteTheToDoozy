@@ -2,15 +2,26 @@
 
 ### Data Structures
 
-ToDo record:
-```
-id: Unique identifier, service-assigned, non-secret,  characters
-title: Required short free text, max 2^8 (256) characters, UTF-8 (max 1KiB)
-description: Optional longer free text, max 2^12 (4096) characters, UTF-8 (max 16KiB)
-status: Required integer representing one of: Not Started, In Progress, Completed, or Abandoned (max 1 byte)
-```
+#### ToDo record
 
-*Note: We are using reduced maximums for some integer fields due to SQLite's integer byte-level storage optimizations.*
+|**Field**|**Type**|**Description**|**Required**|
+|--|--|--|--|
+|id|Integer|Unique, service-assigned identifier, non-secret|Yes|
+|title|Unicode String|Short free text describing the ToDo, max 256 characters|Yes|
+|description|Unicode String|Longer free text describing the ToDo in more detail, max 2048 characters|No|
+|status|Integer|Represents enum, one of: "Not Started", "In Progress", "Completed", or "Abandoned"|Yes|
+|ownerId|Unicode String|Foreign key referring to user that owns the record|Yes|
+|createdAt|Integer Timestamp|Creation time as Unix epoch timestamp|Yes|
+|updatedAt|Integer Timestamp|Last updated time as Unix epoch timestamp|Yes|
+
+#### User record
+
+|**Field**|**Type**|**Description**|**Required**|
+|--|--|--|--|
+|email|Unicode String|User email, serves as user identifier, max 256 characters|Yes|
+|password|Unicode String|Hashed user password, 256 characters|Yes|
+|createdAt|Integer Timestamp|Creation time as Unix epoch timestamp|Yes|
+|updatedAt|Integer Timestamp|Last updated time as Unix epoch timestamp|Yes|
 
 ### Frontend
 
