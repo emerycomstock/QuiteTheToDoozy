@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using Microsoft.AspNetCore.Identity;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using ToDoozy.Server.Common.Enums;
 
@@ -35,6 +36,6 @@ namespace ToDoozy.Server.Data.Entities
 
         // Navigation property
         [ForeignKey(nameof(OwnerId))]
-        public UserEntity? Owner { get; set; }
+        public IdentityUser? Owner { get; set; }
     }
 }
