@@ -289,6 +289,8 @@ Cons:
 
 #### Windows Environment Setup
 
+1. Install .NET 10 SDK
+
 ...
 
 ### Repository Structure

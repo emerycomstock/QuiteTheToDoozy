@@ -1,0 +1,6 @@
+@ToDoozy.Server.API_HostAddress = http://localhost:5087
+
+GET {{ToDoozy.Server.API_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

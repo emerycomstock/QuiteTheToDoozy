@@ -25,5 +25,14 @@ Oh the irony...
 [] Implementation
     [] Frontend
     [] Backend
+        [] ToDo API Skeletons
+        [] User API Skeletons
+        [] EntityFramework Setup
+        [] ToDo Basic Functionality (excluding auth)
+        [] ToDo Pagination and Filtering
+        [] Auth Setup
+        [] HTTP Redirect
+        [] Other Middlewares
+
 [] Testing
 ```

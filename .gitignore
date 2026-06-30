@@ -1,0 +1,23 @@
+## Build outputs
+[Bb]in/
+[Oo]bj/
+mshtml.map
+*.suo
+*.user
+*.sln.docstates
+
+## IDEs and Editors
+.vs/
+.vscode/
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln.docstates
+
+## OS-generated files
+Thumbs.db
+.DS_Store
+
+## Environment secrets and dev settings
+appsettings.Development.json
