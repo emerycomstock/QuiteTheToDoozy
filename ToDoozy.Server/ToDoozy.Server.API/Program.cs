@@ -21,7 +21,7 @@ builder.Services.AddDbContext<ToDoozyDbContext>(options =>
 // Add built-in AuthN/AuthZ services with JWT
 builder.Services.AddAuthorization();
 builder.Services.AddAuthentication().AddJwtBearer();
-builder.Services.AddIdentityCore<IdentityUser>()
+builder.Services.AddIdentityCore<IdentityUser<int>>()
     .AddEntityFrameworkStores<ToDoozyDbContext>()
     .AddApiEndpoints();
 
@@ -51,7 +51,7 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 // Map default handlers for /refresh /login /register
-app.MapIdentityApi<IdentityUser>();
+app.MapIdentityApi<IdentityUser<int>>();
 
 // Map ToDo handlers (require auth)
 app.MapGet("/todo", ToDoHandlers.ListToDos).WithName("ListToDos").RequireAuthorization();

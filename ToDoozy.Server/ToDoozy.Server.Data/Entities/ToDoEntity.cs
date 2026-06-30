@@ -22,7 +22,7 @@ namespace ToDoozy.Server.Data.Entities
         public ToDoStatus? Status { get; set; }
 
         [Required]
-        public string? OwnerId { get; set; }
+        public int OwnerId { get; set; }
 
         // TODO: Do we want to force these to Unix epoch? Probably not worth it - remember to update docs
         [Required]
@@ -36,6 +36,6 @@ namespace ToDoozy.Server.Data.Entities
 
         // Navigation property
         [ForeignKey(nameof(OwnerId))]
-        public IdentityUser? Owner { get; set; }
+        public IdentityUser<int>? Owner { get; set; }
     }
 }
