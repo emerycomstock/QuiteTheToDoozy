@@ -6,6 +6,32 @@
 
 This is an application for creating, viewing, and managing a collection of ToDo tasks. It will consist of both a backend API written in ASP.NET and a frontend written in Vue.
 
+This service will *obviously* be *widely popular* and must scale to large loads and the expectations of its ferociously loyal customers, but the initial MVP will provide only basic functionalities and be capable of supporting the approximate lifetime average load. Additional infrastructure will be required to scale up to support expected lifetime peak loads defined below.
+
+For the MVP phase of this project:
+- We will define a "ToDo" as a task with a title and an optional description. The ToDo will be in one of a handful of states: "Not Started", "In Progress", "Completed", or "Abandoned".
+- Users will have accounts from which they will be able to see and manage only the "ToDos" that they have created.
+- ToDo text will not support any kind of styling.
+- Simple "login or create account" auth flow, using email as user identifier
+- Single page/view with modals for forms
+- Ephemeral in-memory DB
+
+Advanced features following the MVP phase may include:
+- Attachments
+- Third party login integrations
+- User groups
+- Additional user fields like profile picture or alternative username
+- Nested ToDos and project/initiative ToDo buckets
+- ToDo sharing and granular permissions management
+- MCP APIs for agent-based access
+- Richer user management experience
+- Admin pages and flows
+- Usage dashboards
+- Deployment automation
+- Persistent DB
+- Caching & edge optimizations
+- Support for load balancing, horizontal scaling, and data sharding
+
 ### User Stories
 
 |**ID**|**Role**|**Goal**|**Benefit**|**Phase**|
@@ -48,7 +74,7 @@ Requirements are be derived primarily from the user stories above.
 #### Functional Requirements
 
 |**ID**|**Requirement**|**Description**|**Phase**|
-|--|--|--|
+|--|--|--|--|
 |**FR1**|ToDo CRUD Functionality|Create, read, update, delete on ToDo records.|MVP|
 |**FR2**|ToDo Basic Fields|ToDos have title, description, status.|MVP|
 |**FR3**|ToDo Advanced Fields|Attachments, tags, project.|Post-MVP|
@@ -83,33 +109,189 @@ Assumptions about the service:
 
 Assumptions about users:
 - Users may prefer languages other than English that include special characters not representable with ASCII
-- No user will create more than 2^20 (1,048,576) ToDos in throughout their lifetime use of the service
+- Users will create on average 2^10 (1024) ToDos throughout their lifetime use of the service
 - Across the lifetime of the service itself, there will be no more than 2^28 (268,435,456) total users
-- Each user on average will not submit more than 2^8 (256) requests per day
+- Each user will submit a maximum of 2^8 (256) requests per day and an average of 2^5 (32) requests per day
 - Daily active users will not exceed 30% of monthly active users
-- Peak monthly active users will not exceed 2^24 (16,777,216) users
+- Peak monthly active users will on average be 2^20 (1,048,576) but will not exceed 2^24 (16,777,216) users
+- Emails will exceed 256 characters (consuming 512 bytes/0.5KiB if unicode)
+- Passwords will be 256 character unicode strings when using ASP.NET Identity features (consuming 512 bytes/0.5KiB)
+
+Assumptions about ToDos:
+- Titles will require no more than 256 characters (512 bytes/0.5KiB if unicode)
+- Descriptions will require no more than 4096 characters (8192 bytes/8KiB if unicode)
+- Statuses will take a max of 1 byte (integer representation, assuming optimized integer storage)
+
+Assumptions about metadata:
+- Timestamps will consume 4 bytes (Unix timestamp consumes 4 bytes until 2038, after expected EoL of this service)
 
 As a result:
 - Peak daily active users will not exceed 5,033,165 (2^24 * 0.3)
-- Peak requests per second will not exceed 59 (2^24 * 0.3 / (60 * 60 * 24))
-- No more than 2^48 (2^20 * 2^28 = 281,474,976,710,656) ToDos will be created throughout the lifetime of the service
+- Peak requests per second will on average be approximately 33,554,432 (2^20 * 2^5)
+- Peak daily requests will not exceed approximately 536,870,912 (2^24 * 2^5) 
+- Peak requests per second will on average be 117 ((2^24 * 2^5 * 0.3) / (60 * 60 * 24))
+- Peak requests per second will not exceed 1865 ((2^24 * 2^5 * 0.3) / (60 * 60 * 24))
+- No more than 2^38 (2^10 * 2^28 = 274,877,906,944) ToDos will be created throughout the lifetime of the service
+- ToDo IDs will require no more than 5 bytes (integer representation, assuming optimized integer storage)
+- Each ToDo requires a maximum of ~8.5KiB (5 + 512 + 8192 + 1 + 4 + 4 = 8718 bytes) to store
+- Each user requires a maximum of ~1KiB (512 + 512 + 4 + 4 = 1032 bytes) to store
+- Total ToDo storage required over service lifetime is at maximum 2.23 TiB (2^38 * 8718 bytes)
+- Total user storage required over service lifetime is at maximum 258 GiB (2^28 * 1032 bytes)
+- Total lifetime storage requirement is at maximum 2.48 TiB (2.23 TiB + 258 GiB)
 
 *Note: These numbers may seem large for a simple ToDo application. They probably are, but you really don't want to run out of ID space, so better safe than sorry with these calculations.*
 
 ### Key Considerations & Decisions
 
-String representation:
+#### Identifiers
 
+**Option 1:** ROWID/Auto-incrementing Integer
 
-...
-Remember: Security/Escaping content
-...
+Use default integer primary key behavior in SQLite, it is effectively an auto-incrementing integer ID.
 
-### High-level Approach
+Pros:
+- Simple, requires no service-side generation/management
+- Guaranteed uniqueness for single DB instances
+- Better performance and storage efficiency vs strings
 
-...
+Cons:
+- Couples to nature/behavior of DB, which may change post-MVP
+- If multiple servers or DB instances exist post-MVP uniqueness may be violated
+- Less secure than string identifiers if user-facing
+
+**Option 2 (Selected):** Service-generated Integer, Assigned Block
+
+*Chosen for future extensibility, performance, and lower concerns around security due to nature of the service.*
+
+The service generates an integer within its assigned ID range and uses that for a primary key.
+
+Pros:
+- No coupling to nature/behavior of DB, which may change post-MVP
+- Guarantees uniqueness in case of future multi-server, multi-DB scenario
+- Better performance and storage efficiency vs strings
+
+Cons:
+- Requires management of IDs
+- Less secure than string identifiers if user-facing
+
+**Option 3:** Service-generated String, GUID
+
+The service generates a string GUID and uses that for a primary key.
+
+Pros:
+- No coupling to nature/behavior of DB, which may change post-MVP
+- More secure than integer identifiers if user-facing
+
+Cons:
+- Requires management of IDs
+- Worse performance and storage efficiency vs integers
+- Risk of collisions, even if low probability
+
+#### String Encodings
+
+We will be using Entity Framework Core which allows choosing between unicode or non-unicode encodings and maps to underlying DB types automatically.
+
+**Option 1 (Selected):** Unicode
+
+*Chosen for wider language support listed as a requirement.*
+
+Pros:
+- Support for wider variety of characters languages
+
+Cons:
+- Uses two bytes per character rather than one
+
+**Option 2:** Non-unicode
+
+Pros:
+- Uses one byte per character rather than two
+
+Cons:
+- Supports narrower variety of characters and languages.
+
+#### Timestamp Representations in DB
+
+**Option 1:** ISO String
+
+String with format `YYYY-MM-DD HH:MM:SS`.
+
+Pros:
+- Readable for service operators
+
+Cons:
+- Requires more storage
+
+**Option 2 (Selected):** Unix Timestamp Integer
+
+Number of seconds since Unix epoch.
+
+Pros:
+- Consumes less storage
+
+Cons:
+- Not readable for service operatorss
+
+#### Representing ToDo to User Relationships
+
+**Option 1 (Selected):** On-record Foreign Key
+
+*Chosen for one-to-many relationship of owner to ToDo.*
+
+Embed the foreign key in the record itself.
+
+Pros:
+- Good for one-to-many or one-to-one relationships.
+
+Cons:
+- Not good for many-to-many relationships
+
+**Option 2:** xRef Table
+
+*Note: This will be useful post-MVP for granular additional permissions tracking.*
+
+Use dedicated tables to map foreign keys across multiple tables.
+
+Pros:
+- Good for many-to-many relationships
+
+Cons:
+- Not good for one-to-many or one-to-one relationships.
+
+#### MVP UI Page Structure
+
+**Option 1 (Selected):** Single Page & Modal Forms
+
+*Chosen for simplicity.*
+
+Single page with search bar and filter controls. Records listed on the page have embedded control elements on each row. Any forms (login, create ToDo, edit ToDo, confirm) appear as modals.
+
+Pros:
+- Simple to implement
+- Intuitive to use
+
+Cons:
+- Limited real estate
+
+**Option 2:** Multi-page
+
+Have separate pages for various functionalities (login, create ToDo, edit ToDo) and small decisions like action confirmations remain as modals.
+
+Pros:
+- More space to work with for each feature's UI
+
+Cons:
+- More work to implement
+- May be less intuitive to use
 
 ## Appendix
+
+### Environment Setup
+
+*Note: Development was done on **Windows** and has not been tested on other platforms.*
+
+#### Windows Environment Setup
+
+...
 
 ### Repository Structure
 
