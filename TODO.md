@@ -24,6 +24,18 @@ Oh the irony...
 [] Fill in .gitignore with common ignore patterns for tech stack
 [] Implementation
     [] Frontend
+        [] Header/Footer/Main page template
+        [] Models
+        [] ToDo API client
+        [] Auth modal
+        [] Auth token management and refresh
+        [] Table component and create button
+        [] Table items & controls with dummy data
+        [] Paging controls
+        [] Filters
+        [] Create modal
+        [] Update modal
+        [] Styling tweaks
     [X] Backend
         [X] ToDo API Skeletons
         [X] User API Skeletons

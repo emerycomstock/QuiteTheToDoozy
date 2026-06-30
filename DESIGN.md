@@ -16,22 +16,15 @@
 
 #### User record
 
-|**Field**|**Type**|**Description**|**Required**|
-|--|--|--|--|
-|email|Unicode String|User email, serves as user identifier, max 256 characters|Yes|
-|password|Unicode String|Hashed user password, 256 characters|Yes|
-|createdAt|Integer Timestamp|Creation time as Unix epoch timestamp|Yes|
-|updatedAt|Integer Timestamp|Last updated time as Unix epoch timestamp|Yes|
+We will use the ASP.NET Identity `IdentityUser` type with an integer primary key. This type pre-defines fields like `id`, `email`, `password`, and integrates seamlessly with default Identity APIs and services.
 
 ## Backend API Shapes
 
 *Note: All HTTP requests will redirect to HTTPS with a 308 response code.*
 
-### [POST] /user
+### [POST] /register
 
-Create user API.
-
-*Note: 400 response will not specify reason for failure for security reasons.*
+Create user API, ASP.NET Identity default API.
 
 Request body:
 ```
@@ -46,18 +39,9 @@ Responses:
 - `400` -> Bad Request/Email In-use
 - `500` -> Internal Server Error
 
-Success response body:
-```
-{
-    Token: <JWT>
-}
-```
-
 ### [POST] /login
 
-Login API.
-
-*Note: 400 response will not specify reason for failure for security reasons.*
+Login API, ASP.NET Identity default API.
 
 Request body:
 ```
@@ -75,7 +59,36 @@ Responses:
 Success response body:
 ```
 {
-    token: <JWT>
+    TokenType: "Bearer",
+    AccessToken: <Token>,
+    ExpiresIn: <TimeoutSeconds>,
+    RefreshToken: <Token>
+}
+```
+
+### [POST] /refresh
+
+Refresh token API, ASP.NET default API.
+
+Request body:
+```
+{
+    RefreshToken: <token>
+}
+```
+
+Responses:
+- `200` -> Success
+- `400` -> Bad Request
+- `500` -> Internal Server Error
+
+Success response body:
+```
+{
+    TokenType: "Bearer",
+    AccessToken: <Token>,
+    ExpiresIn: <TimeoutSeconds>,
+    RefreshToken: <Token>
 }
 ```
 
@@ -212,7 +225,13 @@ Responses:
 
 Framework: Vue
 
-...
+General concept:
+- Single main page with a list view, including paging controls and status filters
+- List view items will simple icon-based status controls and clickable title to view/edit the entry
+- A button to the top-right of the table will be used to create new ToDos
+- Create/Edit/View forms will all be surfaced as modals over the singular list view page
+- Login/create user will be one unified flow, also surfaced as a modal
+- Auth bearer token refresh will be handled in the background 
 
 ### Backend Details
 
