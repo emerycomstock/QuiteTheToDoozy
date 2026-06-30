@@ -1,2 +1,5 @@
 <Solution>
+  <Project Path="ToDoozy.Server.API/ToDoozy.Server.API.csproj" />
+  <Project Path="ToDoozy.Server.Common/ToDoozy.Server.Common.csproj" Id="ba1676bb-8eda-4d7f-ad5e-ac4faa184de7" />
+  <Project Path="ToDoozy.Server.Data/ToDoozy.Server.Data.csproj" />
 </Solution>

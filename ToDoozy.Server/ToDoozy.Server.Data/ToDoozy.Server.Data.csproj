@@ -10,4 +10,8 @@
     <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="10.0.9" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\ToDoozy.Server.Common\ToDoozy.Server.Common.csproj" />
+  </ItemGroup>
+
 </Project>

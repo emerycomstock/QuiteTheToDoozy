@@ -23,6 +23,7 @@ public static class ToDoHandlers
     }
 
     public static IResult UpdateToDo(
+        [FromRoute] int id,
         [FromBody] UpdateToDoRequest updateParams)
     {
         throw new NotImplementedException();

@@ -126,6 +126,7 @@ Success response body:
     title: <title>,
     description: <description>,
     status: <status>,
+    ownerId: <identifier>,
     createdAt: <createdAt>,
     updatedAt: <updatedAt>
 }
@@ -206,6 +207,7 @@ title: Project Relationships
 ---
 flowchart LR
     ToDoozy.API --> ToDoozy.Common
+    ToDoozy.API --> ToDoozy.Data
     ToDoozy.Data --> ToDoozy.Common
 ```
 

@@ -12,30 +12,18 @@ if (app.Environment.IsDevelopment())
     app.MapOpenApi();
 }
 
+// HTTPS Redirect Middleware
 app.UseHttpsRedirection();
 
-var summaries = new[]
-{
-    "Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching"
-};
+// Map user/auth handlers
+app.MapPost("/user", UserHandlers.CreateUser).WithName("CreateUser");
+app.MapPost("/login", UserHandlers.Login).WithName("Login");
 
-app.MapGet("/weatherforecast", () =>
-{
-    var forecast =  Enumerable.Range(1, 5).Select(index =>
-        new WeatherForecast
-        (
-            DateOnly.FromDateTime(DateTime.Now.AddDays(index)),
-            Random.Shared.Next(-20, 55),
-            summaries[Random.Shared.Next(summaries.Length)]
-        ))
-        .ToArray();
-    return forecast;
-})
-.WithName("GetWeatherForecast");
+// Map ToDo handlers
+app.MapGet("/todo", ToDoHandlers.ListToDos).WithName("ListToDos");
+app.MapGet("/todo/{id}", ToDoHandlers.GetToDoById).WithName("GetToDo");
+app.MapPost("/todo", ToDoHandlers.CreateToDo).WithName("CreateToDo");
+app.MapPatch("/todo/{id}", ToDoHandlers.UpdateToDo).WithName("UpdateToDo");
+app.MapDelete("/todo/{id}", ToDoHandlers.DeleteToDo).WithName("DeleteToDo");
 
 app.Run();
-
-record WeatherForecast(DateOnly Date, int TemperatureC, string? Summary)
-{
-    public int TemperatureF => 32 + (int)(TemperatureC / 0.5556);
-}

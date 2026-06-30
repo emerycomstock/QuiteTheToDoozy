@@ -32,7 +32,7 @@ Oh the irony...
         [] ToDo Pagination and Filtering
         [] Create User Functionality
         [] Login Functionality
-        [] HTTP Redirect
+        [X] HTTP Redirect
         [] Other Middlewares
 
 [] Testing

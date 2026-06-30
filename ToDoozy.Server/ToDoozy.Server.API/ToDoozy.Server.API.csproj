@@ -10,4 +10,9 @@
     <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="10.0.9" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\ToDoozy.Server.Common\ToDoozy.Server.Common.csproj" />
+    <ProjectReference Include="..\ToDoozy.Server.Data\ToDoozy.Server.Data.csproj" />
+  </ItemGroup>
+
 </Project>
