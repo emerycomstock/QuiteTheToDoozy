@@ -19,7 +19,7 @@ Oh the irony...
     [X] Frontend framework choice
     [X] Data structures
     [X] APIs & API shapes
-    [] Backend high-level design/laying out rough components
+    [X] Backend high-level design/laying out rough components
     [] Frontend high-level design/laying out rough components
 [] Fill in .gitignore with common ignore patterns for tech stack
 [] Implementation

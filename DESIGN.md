@@ -191,10 +191,30 @@ Framework: Vue
 
 ...
 
-### Backend
+### Backend Details
 
-Framework: ASP.NET
+Framework: `ASP.NET`
+Solution Name: `ToDoozy`
+Projects:
+- `ToDoozy.API` -> API Handlers, Middlewares, Web Server, DTOs, Validators
+- `ToDoozy.Common` -> Constants, Enums, Utils, Common Models
+- `ToDoozy.Data` -> DB Context, DB Models (Entities)
 
-Remember: Security/Escaping content strings
+```mermaid
+---
+title: Project Relationships
+---
+flowchart LR
+    ToDoozy.API --> ToDoozy.Common
+    ToDoozy.Data --> ToDoozy.Common
+```
 
-...
+*Note: For a larger application you may want a Core/Services project between Data and API projects, but that's overkill for a simple CRUD app like this.*
+
+Our APIs will use DTOs that decouple API shapes from the internal database model representations (Entities). AutoMapper is commonly used to map between such types, but this is overkill for us.
+
+Expected middlewares:
+- Exception handling (catch, log, return 500)
+- HTTP -> HTTPS redirection
+- Routing (ensure requests go to the right handlers)
+- Authorization (ensure users are authorized)
