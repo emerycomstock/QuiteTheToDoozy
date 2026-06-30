@@ -2,9 +2,9 @@
 {
     public enum ToDoStatus
     {
-        NotStarted,
-        InProgress,
-        Completed,
-        Abandoned
+        NotStarted = 0,
+        InProgress = 1,
+        Completed = 2,
+        Abandoned = 3
     }
 }
