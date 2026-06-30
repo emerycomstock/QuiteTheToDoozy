@@ -17,8 +17,8 @@ Oh the irony...
     [X] AI use disclosure
 [] DESIGN initial content
     [X] Frontend framework choice
-    [] Data structures
-    [] APIs & API shapes
+    [X] Data structures
+    [X] APIs & API shapes
     [] Backend high-level design/laying out rough components
     [] Frontend high-level design/laying out rough components
 [] Fill in .gitignore with common ignore patterns for tech stack
