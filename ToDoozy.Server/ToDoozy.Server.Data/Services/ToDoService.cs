@@ -1,4 +1,6 @@
-﻿using ToDoozy.Server.Common.Enums;
+﻿using Microsoft.EntityFrameworkCore;
+using ToDoozy.Server.Common.Enums;
+using ToDoozy.Server.Common.Exceptions;
 using ToDoozy.Server.Data.Entities;
 
 namespace ToDoozy.Server.Data.Services
@@ -12,29 +14,88 @@ namespace ToDoozy.Server.Data.Services
             _context = context;
         }
 
-        public Task<bool> CreateToDo(string? title, string? description, int userId)
+        public async Task<ToDoEntity> GetToDoById(int id, int userId)
         {
+            var entity = await _context.ToDos.FindAsync(id);
+            if (entity is null || entity.OwnerId != userId)
+                throw new ResourceNotFoundException();
+
+            return entity;
+        }
+
+        public async Task<IEnumerable<ToDoEntity>> ListToDos(int page, int limit, string? searchQuery, IEnumerable<ToDoStatus>? statuses, int userId)
+        {
+            var entities = await _context.ToDos
+                .Where(entity => 
+                    entity.OwnerId == userId &&
+                    MatchesAnyStatus(entity, statuses) &&
+                    MatchesSimpleSearchQuery(entity, searchQuery))
+                .OrderBy(entity => entity.CreatedAt)
+                .Skip((page - 1) * limit)
+                .Take(limit)
+                .ToListAsync();
+
             throw new NotImplementedException();
         }
 
-        public Task<bool> DeleteToDo(int id, int userId)
+        public async Task<ToDoEntity> CreateToDo(string? title, string? description, int userId)
         {
-            throw new NotImplementedException();
+            var now = DateTime.UtcNow;
+
+            // Create new record, defaulting to NotStarted status
+            var newToDo = new ToDoEntity()
+            {
+                Title = title,
+                Description = description,
+                Status = ToDoStatus.NotStarted,
+                OwnerId = userId,
+                CreatedAt = now,
+                UpdatedAt = now
+            };
+
+            await _context.ToDos.AddAsync(newToDo);
+            await _context.SaveChangesAsync();
+
+            // Id is populated after SaveChanges
+            return newToDo;
         }
 
-        public Task<ToDoEntity> GetToDoById(int id, int userId)
+        public async Task<ToDoEntity> UpdateToDo(int id, string? title, string? description, ToDoStatus? status, int userId)
         {
-            throw new NotImplementedException();
+            var entity = await GetToDoById(id, userId);
+
+            entity.Title = title ?? entity.Title;
+            entity.Description = description ?? entity.Description;
+            entity.Status = status ?? entity.Status;
+            entity.UpdatedAt = DateTime.UtcNow;
+
+            await _context.SaveChangesAsync();
+
+            return entity;
         }
 
-        public Task<IEnumerable<ToDoEntity>> ListToDos(int page, int limit, IEnumerable<ToDoStatus> statuses, int userId)
+        public async Task DeleteToDo(int id, int userId)
         {
-            throw new NotImplementedException();
+            var entity = await GetToDoById(id, userId);
+
+            _context.ToDos.Remove(entity);
+            _context.SaveChanges();
         }
 
-        public Task<bool> UpdateToDo(int id, string? title, string? description, ToDoStatus? status, int userId)
+        private  bool MatchesAnyStatus(ToDoEntity entity, IEnumerable<ToDoStatus>? statuses)
         {
-            throw new NotImplementedException();
+            // entity.Status should never be null, but we give a sensible default for resiliency
+            return statuses is null || statuses.Contains(entity.Status ?? ToDoStatus.NotStarted);
+        }
+
+        private bool MatchesSimpleSearchQuery(ToDoEntity entity, string? searchQuery)
+        {
+            // TODO: Richer, fuzzier search
+
+            // Use current culture rules for multi-language support, simple case-insensitive contains check
+            return searchQuery is null ||
+                ((entity.Title?.Contains(searchQuery, StringComparison.CurrentCultureIgnoreCase) ?? false) ||
+                (entity.Description?.Contains(searchQuery, StringComparison.CurrentCultureIgnoreCase) ?? false));
         }
     }
 }
