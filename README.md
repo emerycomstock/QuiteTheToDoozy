@@ -292,7 +292,24 @@ Cons:
 
 Prerequisites:
 1. Install .NET 10 SDK
-2. Install Visual Studio
+2. Optional: Install Visual Studio
+3. Install Node 24
+
+Running backend:
+```
+cd ToDoozy.Server
+dotnet run
+# HTTP runs on port 5087
+# HTTPS runs on port 7081
+```
+
+Running frontend:
+```
+cd ToDoozy.UI
+npm install
+npm run dev
+# HTTP runs on port 5173
+```
 
 Testing:
 1. To test backend CLI you can use the "play" button to launch the server. Some sample requests are defined in `ToDoozy.Server.API.http` and can be executed with a click to run manual tests.
@@ -305,6 +322,11 @@ Testing:
 ### Branching Strategy
 
 ...
+
+### What's Next
+
+- Post-MVP User Stories
+- Proper Testing Automation (UTs & E2E Integration Tests)
 
 ### AI Use Disclosure
 

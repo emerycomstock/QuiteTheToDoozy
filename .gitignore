@@ -1,10 +1,12 @@
-## Build outputs
+## Build artifacts
 [Bb]in/
 [Oo]bj/
 mshtml.map
 *.suo
 *.user
 *.sln.docstates
+dist/
+build/
 
 ## IDEs and Editors
 .vs/
@@ -14,6 +16,7 @@ mshtml.map
 *.ntvs*
 *.njsproj
 *.sln.docstates
+*.sw?
 
 ## OS-generated files
 Thumbs.db
@@ -21,3 +24,29 @@ Thumbs.db
 
 ## Environment secrets and dev settings
 appsettings.Development.json
+.env.local
+.env.*.local
+
+# Dependency directories
+node_modules/
+jspm_packages/
+
+# Log files
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+*.tsbuildinfo
+
+.eslintcache
+
+# Cypress
+/cypress/videos/
+/cypress/screenshots/
+
+# Vitest
+__screenshots__/
+
+# Vite
+*.timestamp-*-*.mjs
