@@ -12,14 +12,14 @@ namespace ToDoozy.Server.Data.Entities
 
         [Required]
         [StringLength(256, MinimumLength = 1)]
-        public string? Title { get; set; }
+        public string Title { get; set; } = "PLACEHOLDER";
 
         [StringLength(2048, MinimumLength = 1)]
         public string? Description { get; set; }
 
         [Required]
         [EnumDataType(typeof(ToDoStatus))]
-        public ToDoStatus? Status { get; set; }
+        public ToDoStatus Status { get; set; } = ToDoStatus.NotStarted;
 
         [Required]
         public int OwnerId { get; set; }

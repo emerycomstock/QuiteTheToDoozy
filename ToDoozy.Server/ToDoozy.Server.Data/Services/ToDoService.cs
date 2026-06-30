@@ -31,11 +31,17 @@ namespace ToDoozy.Server.Data.Services
          */
         public async Task<IEnumerable<ToDoEntity>> ListToDos(int page, int limit, string? searchQuery, IEnumerable<ToDoStatus>? statuses, int userId)
         {
+            var validStatuses = ResolveValidStatuses(statuses);
+            var nonNullQueryString = searchQuery ?? string.Empty;
+
             var entities = await _context.ToDos
                 .Where(entity => 
                     entity.OwnerId == userId &&
-                    MatchesAnyStatus(entity, statuses) &&
-                    MatchesSimpleSearchQuery(entity, searchQuery))
+                    validStatuses.Contains(entity.Status) &&
+                    (
+                        entity.Title.Contains(nonNullQueryString) || 
+                        (entity.Description != null && entity.Description.Contains(nonNullQueryString))
+                    ))
                 .OrderBy(entity => entity.CreatedAt)
                 .Skip((page - 1) * limit)
                 .Take(limit)
@@ -98,25 +104,13 @@ namespace ToDoozy.Server.Data.Services
         }
 
         /**
-         * Helper for evaluating status matches
+         * Helper for resolving statuses as a list, converting no filter to all statuses.
          */
-        private  bool MatchesAnyStatus(ToDoEntity entity, IEnumerable<ToDoStatus>? statuses)
+        private IList<ToDoStatus> ResolveValidStatuses(IEnumerable<ToDoStatus>? statuses)
         {
-            // entity.Status should never be null, but we give a sensible default for resiliency
-            return statuses is null || statuses.Contains(entity.Status ?? ToDoStatus.NotStarted);
-        }
+            if (statuses is null) return [ToDoStatus.NotStarted, ToDoStatus.InProgress, ToDoStatus.Completed, ToDoStatus.Abandoned];
 
-        /**
-         * Helper for evaluating search queries, language agnostic, multi-language support.
-         */
-        private bool MatchesSimpleSearchQuery(ToDoEntity entity, string? searchQuery)
-        {
-            // TODO: Richer, fuzzier search
-
-            // Use current culture rules for multi-language support, simple case-insensitive contains check
-            return searchQuery is null ||
-                ((entity.Title?.Contains(searchQuery, StringComparison.CurrentCultureIgnoreCase) ?? false) ||
-                (entity.Description?.Contains(searchQuery, StringComparison.CurrentCultureIgnoreCase) ?? false));
+            return statuses.ToList();
         }
     }
 }

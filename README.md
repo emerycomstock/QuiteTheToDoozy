@@ -290,9 +290,13 @@ Cons:
 
 #### Windows Environment Setup
 
+Prerequisites:
 1. Install .NET 10 SDK
+2. Install Visual Studio
 
-...
+Testing:
+1. To test backend CLI you can use the "play" button to launch the server. Some sample requests are defined in `ToDoozy.Server.API.http` and can be executed with a click to run manual tests.
+2. To test end-to-end from frontend ...
 
 ### Repository Structure
 

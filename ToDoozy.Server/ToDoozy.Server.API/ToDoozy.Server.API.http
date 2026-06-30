@@ -33,11 +33,116 @@ Accept: {{accept}}
 ###
 
 ### Refresh Token Session
+
 POST {{host_secure}}/refresh
 Content-Type: {{contentType}}
+Accept: {{accept}}
 
 {
   "refreshToken": "{{loginRequest.response.body.$.refreshToken}}"
 }
+
+###
+
+### Create ToDo 1
+
+# @name createRequest1
+POST {{host_secure}}/todo
+Content-Type: {{contentType}}
+Accept: {{accept}}
+Authorization: Bearer {{loginRequest.response.body.$.accessToken}}
+
+{
+  "title": "TODO 1 - World domination",
+  "description": "Conquer and consume!"
+}
+
+###
+
+### Create ToDo 2
+
+# @name createRequest2
+POST {{host_secure}}/todo
+Content-Type: {{contentType}}
+Accept: {{accept}}
+Authorization: Bearer {{loginRequest.response.body.$.accessToken}}
+
+{
+  "title": "TODO 2 - Take Vitamins"
+}
+
+###
+
+### Create ToDo 3
+
+# @name createRequest3
+POST {{host_secure}}/todo
+Content-Type: {{contentType}}
+Accept: {{accept}}
+Authorization: Bearer {{loginRequest.response.body.$.accessToken}}
+
+{
+  "title": "TODO 3 - Update ToDos"
+}
+
+###
+
+### List all ToDos
+
+GET {{host_secure}}/todo
+Accept: {{accept}}
+Authorization: Bearer {{loginRequest.response.body.$.accessToken}}
+
+###
+
+### Get a Specific ToDo
+
+GET {{host_secure}}/todo/{{createRequest1.response.body.$.id}}
+Accept: {{accept}}
+Authorization: Bearer {{loginRequest.response.body.$.accessToken}}
+
+###
+
+### Update ToDo 2
+
+PATCH {{host_secure}}/todo/{{createRequest2.response.body.$.id}}
+Content-Type: {{contentType}}
+Accept: {{accept}}
+Authorization: Bearer {{loginRequest.response.body.$.accessToken}}
+
+{
+  "title": "TODO 2 - Get GOOD Vitamins and TAKE them OR ELSE",
+  "description": "B vitamins pls.",
+  "status": "InProgress"
+}
+
+###
+
+### Update ToDo 3
+
+PATCH {{host_secure}}/todo/{{createRequest3.response.body.$.id}}
+Content-Type: {{contentType}}
+Accept: {{accept}}
+Authorization: Bearer {{loginRequest.response.body.$.accessToken}}
+
+{
+  "status": "Completed"
+}
+
+###
+
+### List ToDos In Progress or Not Started ToDos
+
+GET {{host_secure}}/todo?status=notstarted,inprogress
+Accept: {{accept}}
+Authorization: Bearer {{loginRequest.response.body.$.accessToken}}
+
+###
+
+### Delete a ToDo
+
+DELETE {{host_secure}}/todo/{{createRequest3.response.body.$.id}}
+Accept: {{accept}}
+Authorization: Bearer {{loginRequest.response.body.$.accessToken}}
 
 ###

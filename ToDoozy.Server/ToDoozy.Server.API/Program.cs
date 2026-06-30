@@ -1,6 +1,8 @@
+using Microsoft.AspNetCore.Http.Json;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
+using System.Text.Json.Serialization;
 using ToDoozy.Server.Data;
 using ToDoozy.Server.Data.Services;
 
@@ -18,6 +20,12 @@ builder.Services.AddDbContext<ToDoozyDbContext>(options =>
 {
     options.UseSqlite(keepAliveConnection);
 });
+
+// Add Json enum converter for deserializing status enum values
+builder.Services.Configure<JsonOptions>(options =>
+ {
+     options.SerializerOptions.Converters.Add(new JsonStringEnumConverter());
+ });
 
 // Add built-in AuthN/AuthZ services with JWT
 builder.Services.AddAuthorization();

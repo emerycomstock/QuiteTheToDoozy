@@ -24,16 +24,16 @@ Oh the irony...
 [] Fill in .gitignore with common ignore patterns for tech stack
 [] Implementation
     [] Frontend
-    [] Backend
+    [X] Backend
         [X] ToDo API Skeletons
         [X] User API Skeletons
         [X] EntityFramework Setup
-        [] ToDo Basic Functionality (excluding auth)
+        [X] ToDo Basic Functionality (excluding auth)
         [X] ToDo Pagination and Filtering
         [X] Create User Functionality
         [X] Login Functionality
         [X] HTTP Redirect
-        [] Other Middlewares
+        [X] Other Middlewares
 
 [] Testing
 ```
