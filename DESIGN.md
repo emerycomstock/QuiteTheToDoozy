@@ -81,11 +81,12 @@ Success response body:
 
 ### [GET] /todo
 
-List API for ToDo resources, returns partial information about records, simple pagination and status-based filtering.
+List API for ToDo resources, returns partial information about records, simple pagination and status-based filtering. Returns partial records.
 
 Query parameters:
 - `page`
 - `limit`
+- `q`
 - `status`
 
 Responses:
@@ -110,7 +111,7 @@ Success response body:
 
 ### [GET] /todo/{id}
 
-Get API for ToDo resources, retrieves information about a single ToDo.
+Get API for ToDo resources, retrieves information about a single ToDo. Returns full record for developer convenience.
 
 Responses:
 - `200` -> Success
@@ -134,7 +135,7 @@ Success response body:
 
 ### [POST] /todo
 
-Post API for ToDo resources, creates a new ToDo.
+Post API for ToDo resources, creates a new ToDo. Returns full record for developer convenience.
 
 Request body:
 ```
@@ -150,14 +151,22 @@ Responses:
 - `401` -> Unauthorized
 - `500` -> Internal Server Error
 
-Response body:
+Success response body:
 ```
 {
-    todoId: <identifier>
+    id: <identifier>,
+    title: <title>,
+    description: <description>,
+    status: <status>,
+    ownerId: <identifier>,
+    createdAt: <createdAt>,
+    updatedAt: <updatedAt>
 }
 ```
 
 ### [PATCH] /todo/{id}
+
+Patch API for ToDo resources, updates content of an existing ToDo record. Returns the full updated record for developer convenience.
 
 Request body:
 ```
@@ -174,6 +183,19 @@ Responses:
 - `401` -> Unauthorized
 - `404` -> Not found
 - `500` -> Internal Server Error
+
+Success response body:
+```
+{
+    id: <identifier>,
+    title: <title>,
+    description: <description>,
+    status: <status>,
+    ownerId: <identifier>,
+    createdAt: <createdAt>,
+    updatedAt: <updatedAt>
+}
+```
 
 ### [DELETE] /todo/{id}
 

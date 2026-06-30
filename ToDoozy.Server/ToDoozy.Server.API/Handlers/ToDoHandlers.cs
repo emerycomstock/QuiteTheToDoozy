@@ -11,6 +11,7 @@ public static class ToDoHandlers
     public static IResult ListToDos(
         [FromQuery] int page,
         [FromQuery] int limit,
+        [FromQuery] string q,
         [FromQuery] string status)
     {
         throw new NotImplementedException();

@@ -27,11 +27,11 @@ Oh the irony...
     [] Backend
         [X] ToDo API Skeletons
         [X] User API Skeletons
-        [] EntityFramework Setup
+        [X] EntityFramework Setup
         [] ToDo Basic Functionality (excluding auth)
-        [] ToDo Pagination and Filtering
-        [] Create User Functionality
-        [] Login Functionality
+        [X] ToDo Pagination and Filtering
+        [X] Create User Functionality
+        [X] Login Functionality
         [X] HTTP Redirect
         [] Other Middlewares
 

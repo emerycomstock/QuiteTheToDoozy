@@ -14,15 +14,21 @@ namespace ToDoozy.Server.Data.Services
             _context = context;
         }
 
+        /**
+         * Retrieves a record from the DB, throws ResourceNotFoundException if no such resource is owned by the user.
+         */
         public async Task<ToDoEntity> GetToDoById(int id, int userId)
         {
             var entity = await _context.ToDos.FindAsync(id);
             if (entity is null || entity.OwnerId != userId)
-                throw new ResourceNotFoundException();
+                throw new ResourceNotFoundException($"ToDo with id {id} not found for user {userId}.");
 
             return entity;
         }
 
+        /**
+         * Lists records in the DB, supports pagination, search query, and status-level filtering
+         */
         public async Task<IEnumerable<ToDoEntity>> ListToDos(int page, int limit, string? searchQuery, IEnumerable<ToDoStatus>? statuses, int userId)
         {
             var entities = await _context.ToDos
@@ -35,15 +41,18 @@ namespace ToDoozy.Server.Data.Services
                 .Take(limit)
                 .ToListAsync();
 
-            throw new NotImplementedException();
+            return entities;
         }
 
+        /**
+         * Creates a new record in the DB.
+         */
         public async Task<ToDoEntity> CreateToDo(string? title, string? description, int userId)
         {
             var now = DateTime.UtcNow;
 
             // Create new record, defaulting to NotStarted status
-            var newToDo = new ToDoEntity()
+            var newToDo = new ToDoEntity
             {
                 Title = title,
                 Description = description,
@@ -60,6 +69,9 @@ namespace ToDoozy.Server.Data.Services
             return newToDo;
         }
 
+        /**
+         * Updates a record in the DB, throws ResourceNotFoundException if no such resource is owned by the user.
+         */
         public async Task<ToDoEntity> UpdateToDo(int id, string? title, string? description, ToDoStatus? status, int userId)
         {
             var entity = await GetToDoById(id, userId);
@@ -74,6 +86,9 @@ namespace ToDoozy.Server.Data.Services
             return entity;
         }
 
+        /**
+         * Deletes a record from the DB, throws ResourceNotFoundException if no such resource is owned by the user.
+         */
         public async Task DeleteToDo(int id, int userId)
         {
             var entity = await GetToDoById(id, userId);
@@ -82,12 +97,18 @@ namespace ToDoozy.Server.Data.Services
             _context.SaveChanges();
         }
 
+        /**
+         * Helper for evaluating status matches
+         */
         private  bool MatchesAnyStatus(ToDoEntity entity, IEnumerable<ToDoStatus>? statuses)
         {
             // entity.Status should never be null, but we give a sensible default for resiliency
             return statuses is null || statuses.Contains(entity.Status ?? ToDoStatus.NotStarted);
         }
 
+        /**
+         * Helper for evaluating search queries, language agnostic, multi-language support.
+         */
         private bool MatchesSimpleSearchQuery(ToDoEntity entity, string? searchQuery)
         {
             // TODO: Richer, fuzzier search
