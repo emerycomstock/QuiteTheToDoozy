@@ -10,9 +10,16 @@ const { authState, errorMessage, isLoading } = storeToRefs(store)
 const email = defineModel<string>('email')
 const password = defineModel<string>('password')
 
-const handleLoginRegister = () => {
+const emit = defineEmits<{
+    loginSuccess: []
+}>()
+
+const handleLoginRegister = async () => {
     // TODO: Validate email and password
-    store.loginOrRegister(email.value ?? '', password.value ?? '')
+    await store.loginOrRegister(email.value ?? '', password.value ?? '')
+    if (authState.value.isAuthenticated) {
+        emit('loginSuccess')
+    }
 }
 </script>
 

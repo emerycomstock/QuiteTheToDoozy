@@ -13,22 +13,44 @@ const props = defineProps({
 // Control modal visibility
 const isEditModalOpen = ref(false)
 
+// Define structured event payloads emitted on close
+const emit = defineEmits<{
+  updateSuccess: []
+}>()
+
+const handleUpdateSuccess = () => {
+  emit('updateSuccess')
+}
+
 // Modal open function
 const openEditModal = () => {
+
+}
+
+// Quick update functions
+const completeToDo = () => {
+
+}
+
+const abandonToDo = () => {
+
+}
+
+const deleteToDo = () => {
 
 }
 </script>
 
 <template>
-    <div class="todo-item">
+    <div class="todo-item" @click="openEditModal()">
         <div class="todo-left">
-            <Check class="icon" />
+            <Check class="icon" @click="completeToDo()" />
             <div class="todo-title">{{ title }}</div>
         </div>
         <div class="todo-right">
             <div :class="status">{{ status }}</div>
-            <Ban class="icon" />
-            <Trash class="icon" />
+            <Ban class="icon" @click="abandonToDo()" />
+            <Trash class="icon" @click="deleteToDo()"/>
         </div>
     </div>
 </template>

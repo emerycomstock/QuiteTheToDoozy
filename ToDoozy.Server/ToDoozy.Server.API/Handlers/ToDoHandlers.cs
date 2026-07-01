@@ -47,10 +47,10 @@ public static class ToDoHandlers
         IToDoService service,
         ClaimsPrincipal user,
         UserManager<IdentityUser<int>> userManager,
-        [FromQuery, Range(1, 10000)] int page = 1,
-        [FromQuery, Range(10, 100)] int limit = 20,
-        [FromQuery] string? q = null,
-        [FromQuery] string? status = null)
+        [Range(1, 10000)] int page = 1,
+        [Range(10, 100)] int limit = 20,
+        string? q = null,
+        string? status = null)
     {
 
         try

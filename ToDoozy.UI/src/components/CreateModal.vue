@@ -1,5 +1,11 @@
 <script setup lang="ts">
+import { useUserStore } from '@/stores/userStore.ts'
+import { storeToRefs } from 'pinia'
 import BaseButton from './BaseButton.vue'
+import axios from 'axios'
+
+const store = useUserStore()
+const { authState } = storeToRefs(store)
 
 // Visibility control
 const isOpen = defineModel<boolean>('isOpen', { default: false })
@@ -9,26 +15,33 @@ const createFailed = defineModel<boolean>('createFailed', { default: false })
 const title = defineModel<string>('title')
 const description = defineModel<string>('description')
 
-// Parameters
-// interface ModalProps { }
-// defineProps<ModalProps>()
-
 // Define structured event payloads emitted on close
 const emit = defineEmits<{
   createSuccess: []
 }>()
 
-const handleConfirm = () => {
+const handleConfirm = async () => {
   // TODO: Try create, if success, emit success, else show failure message
 
-  const success = false;
-  if (success) {
+  try {
+    var response = await axios.post('https://127.0.0.1:7081/todo', {
+      title: title.value,
+      description: description.value
+    }, 
+    {
+        headers: { 'Authorization': `Bearer ${authState.value.accessToken}` }
+    })
+    console.log(`Create ToDo result: ${JSON.stringify(response.data)}`)
     emit('createSuccess')
     createFailed.value = false
     isOpen.value = false
-  }
-  else {
-    createFailed.value = true;
+  } catch (err) {
+      if (axios.isAxiosError(err)) {
+          console.error(`Create ToDo failed: [${err.response?.status}] ${err.response?.statusText}\n${JSON.stringify(err.response?.data)}`)
+      } else {
+          console.error('Create ToDo failed, non-axios:', err);
+      }
+      createFailed.value = true;
   }
 }
 

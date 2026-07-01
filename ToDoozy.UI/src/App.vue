@@ -12,7 +12,6 @@ const { authState } = storeToRefs(store)
 
 <template>
   <header>
-    <div></div>
     <div>
       <h1>Quite the ToDoozy!</h1>
     </div>
@@ -25,8 +24,6 @@ const { authState } = storeToRefs(store)
   <main>
     <ToDoList />
   </main>
-
-  <LoginRegisterModal/>
 </template>
 
 <style scoped>

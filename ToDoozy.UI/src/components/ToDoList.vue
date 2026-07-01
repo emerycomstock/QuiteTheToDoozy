@@ -1,24 +1,35 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue'
+import { useUserStore } from '@/stores/userStore.ts'
+import { storeToRefs } from 'pinia'
+import type { ToDoPartial } from '@/types/todo.ts'
 import Plus from '@primevue/icons/plus'
 import Refresh from '@primevue/icons/refresh'
 import BaseButton from './BaseButton.vue'
 import ToDoItem from './ToDoItem.vue'
 import CreateModal from './CreateModal.vue'
+import LoginRegisterModal from './LoginRegisterModal.vue'
+import axios from 'axios'
 
-// Temp items for testing
-const items = ref(Array.from({ length: 50 }, (_, i) => ({ id: i + 1, title: `ToDo ${i + 1}`, status: 'InProgress' })))
+const store = useUserStore()
+const { authState } = storeToRefs(store)
+
+const items = ref<ToDoPartial[]>([])
 const currentPage = ref(1)
 const itemsPerPage = ref(10)
 
-const totalPages = computed(() => Math.ceil(items.value.length / itemsPerPage.value))
-const paginatedItems = computed(() => {
-  const start = (currentPage.value - 1) * itemsPerPage.value
-  return items.value.slice(start, start + itemsPerPage.value)
-})
+function incrementPage() {
+    if (items.value.length == itemsPerPage.value) {
+        currentPage.value += 1
+        refresh()
+    }
+}
 
-function changePage(page: number) {
-  if (page >= 1 && page <= totalPages.value) currentPage.value = page
+function decrementPage() {
+    if (currentPage.value > 1) {
+        currentPage.value -= 1
+        refresh()
+    }
 }
 
 // Control modal visibility
@@ -29,8 +40,21 @@ const openCreateModal = () => {
     isCreateModalOpen.value = true
 }
 
-const refresh = () => {
-    
+const refresh = async () => {
+    try {
+        var url = `https://127.0.0.1:7081/todo?page=${currentPage.value}&limit=${itemsPerPage.value}`;
+        var response = await axios.get(url, {
+            headers: { 'Authorization': `Bearer ${authState.value.accessToken}` }
+        })
+        console.log(`Refresh ToDos result: ${JSON.stringify(response.data)}`)
+        items.value = response.data.toDos as ToDoPartial[];
+    } catch (err) {
+        if (axios.isAxiosError(err)) {
+            console.error(`Refresh ToDos failed: [${err.response?.status}] ${err.response?.statusText}\n${JSON.stringify(err.response?.data)}`)
+        } else {
+            console.error('Refresh ToDos failed, non-axios:', err);
+        }
+    }
 }
 </script>
 
@@ -42,19 +66,21 @@ const refresh = () => {
         </div>
 
         <div class="content-row-container">
-            <ToDoItem v-for="item in paginatedItems" :key="item.id" :id="item.id" :title="item.title" :status="item.status"></ToDoItem>
+            <ToDoItem v-for="item in items" :key="item.id" :id="item.id" :title="item.title" :status="item.status"></ToDoItem>
         </div>
 
         <div class="lower-control-row">
-            <BaseButton @click="changePage(currentPage - 1)" :disabled="currentPage === 1">Prev</BaseButton>
+            <BaseButton @click="decrementPage()" :disabled="currentPage === 1">Prev</BaseButton>
             <p class="page-number">{{ currentPage }}</p>
-            <BaseButton @click="changePage(currentPage + 1)" :disabled="currentPage === totalPages">Next</BaseButton>
+            <BaseButton @click="incrementPage()" :disabled="items.length != itemsPerPage">Next</BaseButton>
         </div>
     </div>
 
+    <LoginRegisterModal @loginSuccess="refresh"/>
     <CreateModal
       v-model:isOpen="isCreateModalOpen"
       @createSuccess="refresh"
+      @updateSuccess="refresh"
     />
 </template>
 
