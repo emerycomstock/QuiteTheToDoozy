@@ -1,10 +1,11 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue'
 import BaseButton from './BaseButton.vue'
+import ToDoItem from './ToDoItem.vue'
 import CreateModal from './CreateModal.vue'
 
 // Temp items for testing
-const items = ref(Array.from({ length: 50 }, (_, i) => ({ id: i + 1, title: `ToDo ${i + 1}`, status: 'In Progress' })))
+const items = ref(Array.from({ length: 50 }, (_, i) => ({ id: i + 1, title: `ToDo ${i + 1}`, status: 'InProgress' })))
 const currentPage = ref(1)
 const itemsPerPage = ref(10)
 
@@ -20,14 +21,10 @@ function changePage(page: number) {
 
 // Control modal visibility
 const isCreateModalOpen = ref(false)
-const isEditModalOpen = ref(false)
 
-// Modal open functions
+// Modal open function
 const openCreateModal = () => {
     isCreateModalOpen.value = true
-}
-const openEditModal = () => {
-
 }
 
 const refresh = () => {
@@ -43,11 +40,7 @@ const refresh = () => {
         </div>
 
         <div class="content-row-container">
-            <ul>
-                <li v-for="item in paginatedItems" :key="item.id">
-                    [{{ item.status }}] {{ item.title }}
-                </li>
-            </ul>
+            <ToDoItem v-for="item in paginatedItems" :key="item.id" :id="item.id" :title="item.title" :status="item.status"></ToDoItem>
         </div>
 
         <div class="lower-control-row">

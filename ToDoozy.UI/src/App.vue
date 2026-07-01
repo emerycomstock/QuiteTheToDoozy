@@ -2,8 +2,10 @@
 import { ref } from 'vue'
 import ToDoList from './components/ToDoList.vue'
 
+// Control modal visibility
 const isAuthModalOpen = ref(false)
 
+// Modal open function
 const openAuthModal = () => {
 
 }

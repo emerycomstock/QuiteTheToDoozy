@@ -5,6 +5,10 @@ import BaseButton from './BaseButton.vue'
 const isOpen = defineModel<boolean>('isOpen', { default: false })
 const createFailed = defineModel<boolean>('createFailed', { default: false })
 
+// Form control bindings
+const title = defineModel<string>('title')
+const description = defineModel<string>('description')
+
 // Parameters
 // interface ModalProps { }
 // defineProps<ModalProps>()
@@ -42,8 +46,10 @@ const handleCancel = () => {
         <div v-if="createFailed" class="error-box">
           <p>Failed to create record</p>
         </div>
-        <p class="dark-text">Title</p>
-        <p class="dark-text">Description</p>
+        <p><i class="dark-text">Title</i></p>
+        <input v-model="title" placeholder="My ToDo!"/>
+        <p><i class="dark-text">Description</i></p>
+        <textarea v-model="description" placeholder="All my details!" rows="3"></textarea>
         
         <div class="modal-actions">
           <BaseButton @click="handleCancel()">Cancel</BaseButton>
@@ -55,6 +61,14 @@ const handleCancel = () => {
 </template>
 
 <style scoped>
+input {
+  width: 100%;
+}
+
+textarea {
+  width: 100%;
+}
+
 .modal-backdrop {
   position: fixed;
   top: 0; left: 0; width: 100vw; height: 100vh;
