@@ -104,85 +104,42 @@ Requirements are be derived primarily from the user stories above.
 
 ### Assumptions & Scale
 
-Assumptions about the service:
-- The service will be maintained for 10 years (120 months)
-
 Assumptions about users:
 - Users may prefer languages other than English that include special characters not representable with ASCII
-- Users will create on average 2^10 (1024) ToDos throughout their lifetime use of the service
 - Users will not create more than 1,000,000 ToDos throughout their lifetime use of the service
-- Across the lifetime of the service itself, there will be no more than 2^24 (16,777,216) total users
-- Each user will submit an average of 2^5 (32) requests per day
-- Daily active users will not exceed 30% of monthly active users
-- Peak monthly active users will on average be 2^20 (1,048,576)
-- Emails will exceed 256 characters (consuming 512 bytes/0.5KiB if unicode)
-- Passwords will be 256 character unicode strings when using ASP.NET Identity features (consuming 512 bytes/0.5KiB)
+- Emails will not exceed 256 characters
+- Hashed passwords will be 256 character unicode strings when using ASP.NET Identity features
 
 Assumptions about ToDos:
-- Titles will require no more than 256 characters (512 bytes/0.5KiB if unicode)
-- Descriptions will require no more than 2048 characters (4096 bytes/4KiB if unicode)
-- Statuses will take a max of 1 byte (integer representation, assuming optimized integer storage)
-
-Assumptions about metadata:
-- Timestamps will consume 4 bytes (Unix timestamp consumes 4 bytes until 2038, after expected EoL of this service)
-
-As a result:
-- Peak daily active users will not exceed 314,573 (2^20 * 0.3)
-- Peak daily requests will not exceed approximately 10,329,066 (2^20 * 2^5 * 0.3) 
-- Peak requests per second will on average be 117 ((2^20 * 2^5 * 0.3) / (60 * 60 * 24))
-- No more than 17,179,869,184 (2^10 * 2^24) ToDos will be created throughout the lifetime of the service
-- ToDo IDs will require no more than 5 bytes (integer representation, assuming optimized integer storage)
-- Each ToDo requires a maximum of ~8.5KiB (5 + 512 + 4096 + 1 + 512 + 4 + 4 = 5134 bytes) to store
-- Each user requires a maximum of ~1KiB (512 + 512 + 4 + 4 = 1032 bytes) to store
-- Total ToDo storage required over service lifetime is at maximum ~146 TiB (2^34 * 9230 bytes)
-- Total user storage required over service lifetime is at maximum ~278 GiB (2^28 * 1032 bytes)
-- Total lifetime storage requirement is at maximum ~146 TiB ((2^34 * 9230 bytes) + (2^28 * 1032 bytes))
-
-*Note: These numbers may seem large for a simple ToDo application. They probably are, but you really don't want to run out of ID space, so better safe than sorry with these calculations.*
+- Titles will require no more than 256 characters
+- Descriptions will require no more than 2048 characters
+- Not Started, In Progress, Completed, and Abandoned are sufficient statuses for this use case
 
 ### Key Considerations & Decisions
 
 #### Identifiers
 
-**Option 1:** ROWID/Auto-incrementing Integer
+**Option 1 (Selected):** Auto-incrementing Integer
 
-Use default integer primary key behavior in SQLite, it is effectively an auto-incrementing integer ID.
+*Chosen for simplicity, performance, and lower concerns around security due to nature of the service.*
+
+Utilize an auto-incrementing integer key.
 
 Pros:
-- Simple, requires no service-side generation/management
-- Guaranteed uniqueness for single DB instances
+- Guarantees uniqueness for current scenario
 - Better performance and storage efficiency vs strings
 
 Cons:
-- Couples to nature/behavior of DB, which may change post-MVP
-- If multiple servers or DB instances exist post-MVP uniqueness may be violated
 - Less secure than string identifiers if user-facing
 
-**Option 2 (Selected):** Service-generated Integer, Assigned Block
-
-*Chosen for future extensibility, performance, and lower concerns around security due to nature of the service.*
-
-The service generates an integer within its assigned ID range and uses that for a primary key.
-
-Pros:
-- No coupling to nature/behavior of DB, which may change post-MVP
-- Guarantees uniqueness in case of future multi-server, multi-DB scenario
-- Better performance and storage efficiency vs strings
-
-Cons:
-- Requires management of IDs
-- Less secure than string identifiers if user-facing
-
-**Option 3:** Service-generated String, GUID
+**Option 2:** Service-generated String, GUID
 
 The service generates a string GUID and uses that for a primary key.
 
 Pros:
-- No coupling to nature/behavior of DB, which may change post-MVP
 - More secure than integer identifiers if user-facing
 
 Cons:
-- Requires management of IDs
 - Worse performance and storage efficiency vs integers
 - Risk of collisions, even if low probability
 
@@ -192,7 +149,7 @@ We will be using Entity Framework Core which allows choosing between unicode or 
 
 **Option 1 (Selected):** Unicode
 
-*Chosen for wider language support listed as a requirement.*
+*Chosen for wider language support.*
 
 Pros:
 - Support for wider variety of characters languages
@@ -207,28 +164,6 @@ Pros:
 
 Cons:
 - Supports narrower variety of characters and languages.
-
-#### Timestamp Representations in DB
-
-**Option 1:** ISO String
-
-String with format `YYYY-MM-DD HH:MM:SS`.
-
-Pros:
-- Readable for service operators
-
-Cons:
-- Requires more storage
-
-**Option 2 (Selected):** Unix Timestamp Integer
-
-Number of seconds since Unix epoch.
-
-Pros:
-- Consumes less storage
-
-Cons:
-- Not readable for service operatorss
 
 #### Representing ToDo to User Relationships
 
@@ -312,21 +247,32 @@ npm run dev
 ```
 
 Testing:
-1. To test backend CLI you can use the "play" button to launch the server. Some sample requests are defined in `ToDoozy.Server.API.http` and can be executed with a click to run manual tests.
-2. To test end-to-end from frontend ...
+1. To test the backend you can use the "play" button in Visual Studio to launch the server. Some sample requests are defined in `ToDoozy.Server.API.http` and can be executed with a click to run manual tests.
+2. To test end-to-end from the frontend start both the backend and frontend simultaneously, access the frontend at `http://localhost:5173` and use the app.
 
-### Repository Structure
+### What Remains Incomplete
 
-...
-
-### Branching Strategy
-
-...
-
-### What's Next
-
-- Post-MVP User Stories
+- Post-MVP User Stories From Above
 - Proper Testing Automation (UTs & E2E Integration Tests)
+- Proper Metrics/Logs/Monitoring
+- Proper Documentation
+- Integration with CI/IaC
+- Other Infra (External Load Balancers, "Scale Out" Story, etc.)
+- Some Known Bugs
+    - Currently filtering away all statuses "loops back" to including all statuses
+    - Pagination allows you to navigate to an empty page if total records are divisible by page size
+    - Some API responses could be tightened (leak less stack traces, etc.)
+- UI Tweaks
+    - Could use a facelift in general
+    - Logout button is too close/not aligned with email
+    - Color scheme needs a major revamp
+    - Using reduced icon set due to an issue with the icon package
+    - Multi-layout support (including mobile)
+    - Need to tighten up API response validation & response (surfacing API errors, etc.)
+    - Some extra consistency/redundancy to ensure authentication state is valid would help
+- Frontend code could use some light cleanup
+    - Factor out the ToDo access code into a separate store/client type
+    - Some duplicate code across components that do similar things, especially modals
 
 ### AI Use Disclosure
 

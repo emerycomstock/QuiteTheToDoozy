@@ -225,13 +225,18 @@ Responses:
 
 Framework: Vue
 
-General concept:
-- Single main page with a list view, including paging controls and status filters
-- List view items will simple icon-based status controls and clickable title to view/edit the entry
-- A button to the top-right of the table will be used to create new ToDos
-- Create/Edit/View forms will all be surfaced as modals over the singular list view page
-- Login/create user will be one unified flow, also surfaced as a modal
-- Auth bearer token refresh will be handled in the background 
+Layout:
+- Single page application, the main view will be a glorified table with filters, a search bar, paging/CRUD controls
+- List items will have shorthand icon controls for performing status updates/progressions
+- List items can be clicked to open an edit modal
+- The top right create button can be used to open a create modal
+- A login/register modal will be forced open if the user is not authenticated
+- Token refresh failure will result in login/register modal popping up again
+
+Auth:
+- Managed via pinia store
+- Login/register will be a single unified flow (login --fail--> register --success--> login --success-->)
+- Refresh will be on managed timer, protected by mutex
 
 ### Backend Details
 
