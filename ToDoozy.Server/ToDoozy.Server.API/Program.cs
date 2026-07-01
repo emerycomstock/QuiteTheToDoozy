@@ -27,6 +27,16 @@ builder.Services.Configure<JsonOptions>(options =>
      options.SerializerOptions.Converters.Add(new JsonStringEnumConverter());
  });
 
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowDevFrontend", policy =>
+    {
+        policy.WithOrigins("http://localhost:5173") // Your frontend's exact URL
+              .AllowAnyHeader()
+              .AllowAnyMethod();
+    });
+});
+
 // Add built-in AuthN/AuthZ services with JWT
 builder.Services.AddAuthorization();
 builder.Services
@@ -60,6 +70,8 @@ using (var scope = app.Services.CreateScope())
 
 // Use default routing middleware
 app.UseRouting();
+// Use CORS for dev frontend
+app.UseCors("AllowDevFrontend");
 // Use default HTTPS redirect middleware
 app.UseHttpsRedirection();
 // Use default AuthN/AuthZ middleware

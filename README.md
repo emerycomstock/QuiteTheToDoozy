@@ -298,7 +298,7 @@ Prerequisites:
 Running backend:
 ```
 cd ToDoozy.Server
-dotnet run
+dotnet run --project ToDoozy.Server.API
 # HTTP runs on port 5087
 # HTTPS runs on port 7081
 ```

@@ -1,46 +1,46 @@
 <script setup lang="ts">
 import { ref } from 'vue'
-import { userStore } from '@/stores/userStore.ts'
+import { useUserStore } from '@/stores/userStore.ts'
 import { storeToRefs } from 'pinia'
+import Times from '@primevue/icons/times'
 import ToDoList from './components/ToDoList.vue'
+import LoginRegisterModal from './components/LoginRegisterModal.vue'
 
-// Control modal visibility
-const isAuthModalOpen = ref(false)
-
-const store = userStore()
-const { authState, errorMessage } = storeToRefs(store)
-
-// Modal open function
-const openAuthModal = () => {
-
-}
-
+const store = useUserStore()
+const { authState } = storeToRefs(store)
 </script>
 
 <template>
   <header>
+    <div></div>
     <div>
       <h1>Quite the ToDoozy!</h1>
+    </div>
+    <div>
+      <i>{{ authState.userEmail }}</i>
+      <Times @click="store.logout()" />
     </div>
   </header>
 
   <main>
     <ToDoList />
   </main>
+
+  <LoginRegisterModal/>
 </template>
 
 <style scoped>
 header {
   line-height: 1.5;
   display: flex;
-  justify-content: center;
-  align-items: stretch
+  justify-content: space-between;
+  align-items: stretch;
 }
 
 main {
   display: flex;
   flex: 1;
-  align-items: stretch
+  align-items: stretch;
 }
 
 .logo {

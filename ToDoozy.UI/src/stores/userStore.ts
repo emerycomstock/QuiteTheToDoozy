@@ -4,7 +4,7 @@ import { Mutex } from 'async-mutex';
 import axios from 'axios'
 import type { AuthState } from '@/types/auth.ts'
 
-export const userStore = defineStore('user', () => {
+export const useUserStore = defineStore('user', () => {
     // State
     const timerId = ref<number|null>(null)
     const authState = ref<AuthState>({
@@ -25,13 +25,15 @@ export const userStore = defineStore('user', () => {
     // Actions
     async function loginOrRegister(email: string, password: string): Promise<void> {
         isLoading.value = true;
-        errorMessage.value = "";
+        errorMessage.value = null;
         try {
             if (await login(email, password) || (await register(email, password) && await login(email, password))) {
                 // Success
                 return;
             }
-            errorMessage.value = "Incorrect password"
+            if (!errorMessage.value) {
+                errorMessage.value = "Unable to login or register"
+            }
             setUnauthenticated(authState.value.userEmail ?? "")
         } finally {
             isLoading.value = false;
@@ -79,8 +81,10 @@ export const userStore = defineStore('user', () => {
             return; // No-op, not authenticated
         }
 
+        errorMessage.value = null
         try {
-            const response = await axios.post('https://localhost:7081/refresh', { refreshToken: authState.value.refreshToken })
+            const response = await axios.post('https://127.0.0.1:7081/refresh', { refreshToken: authState.value.refreshToken })
+            console.log(`Refresh response: [${response.status}] ${response.statusText}`)
             authState.value = {
                 userEmail: authState.value.userEmail,
                 accessToken: response.data.accessToken,
@@ -91,7 +95,11 @@ export const userStore = defineStore('user', () => {
             setTimer();
         } catch (err) {
             // Failure, set to unauthenticated
-            console.error(err)
+            if (axios.isAxiosError(err)) {
+                console.error(`Refresh failed: [${err.response?.status}] ${err.response?.statusText}\n${JSON.stringify(err.response?.data)}`)
+            } else {
+                console.error('Refresh failed, non-axios:', err);
+            }
             errorMessage.value = "Token refresh failed"
             clearTimer();
             setUnauthenticated(authState.value.userEmail ?? "")
@@ -100,7 +108,8 @@ export const userStore = defineStore('user', () => {
 
     async function login(email: string, password: string): Promise<boolean> {
         try {
-            const response = await axios.post('https://localhost:7081/login', { email: email, password: password })
+            const response = await axios.post('https://127.0.0.1:7081/login', { email: email, password: password })
+            console.log(`Login response: [${response.status}] ${response.statusText}`)
             authState.value = {
                 userEmail: email,
                 accessToken: response.data.accessToken,
@@ -111,17 +120,34 @@ export const userStore = defineStore('user', () => {
             setTimer();
             return true
         } catch (err) {
-            console.error(err)
+            if (axios.isAxiosError(err)) {
+                console.error(`Login failed: [${err.response?.status}] ${err.response?.statusText}\n${JSON.stringify(err.response?.data)}`)
+            } else {
+                console.error('Login failed, non-axios:', err);
+            }
             return false;
         }
     }
 
     async function register(email: string, password: string): Promise<boolean> {
         try {
-            await axios.post('https://localhost:7081/register', { email: email, password: password })
+            var response = await axios.post('https://127.0.0.1:7081/register', { email: email, password: password })
+            console.log(`Register response: [${response.status}] ${response.statusText}`)
             return true
         } catch (err) {
-            console.error(err)
+            if (axios.isAxiosError(err)) {
+                console.error(`Register failed: [${err.response?.status}] ${err.response?.statusText}\n${JSON.stringify(err.response?.data)}`)
+                if (err.response?.status == 400 && err.response?.data.errors) {
+                    let errors: string[] = []
+                    Object.keys(err.response.data.errors).forEach((key) => {
+                        const value = err.response?.data.errors[key]
+                        errors = Array.isArray(value) ? [...errors, ...value] : errors
+                    });
+                    errorMessage.value = errors.join('\n')
+                }
+            } else {
+                console.error('Register failed, non-axios:', err);
+            }
             return false;
         }
     }
