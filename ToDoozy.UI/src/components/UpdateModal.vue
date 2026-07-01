@@ -3,35 +3,56 @@ import { useUserStore } from '@/stores/userStore.ts'
 import { storeToRefs } from 'pinia'
 import BaseButton from './BaseButton.vue'
 import axios from 'axios'
+import { ref } from 'vue'
 
 const store = useUserStore()
 const { authState } = storeToRefs(store)
 
+const props = defineProps({
+    id: {type: Number, required: true},
+    title: {type: String, requred: true},
+    description: {type: String, required: false},
+    status: {type: String, required: true}
+})
+
 // Visibility control
 const isOpen = defineModel<boolean>('isOpen', { default: false })
-const createFailed = defineModel<boolean>('createFailed', { default: false })
+const updateFailed = defineModel<boolean>('updateFailed', { default: false })
 
 // Form control bindings
 const title = defineModel<string>('title')
 const description = defineModel<string>('description')
+const status = defineModel<string>('status')
+
+const statuses = ref([
+  { id: 1, text: 'Not Started', value: 'NotStarted' },
+  { id: 2, text: 'In Progress', value: 'InProgress' },
+  { id: 3, text: 'Completed', value: 'Completed' },
+  { id: 4, text: 'Abandoned', value: 'Abandoned' }
+])
+
+title.value = props.title
+description.value = props.description
+status.value = props.status
 
 // Define structured event payloads emitted on close
 const emit = defineEmits<{
-  createSuccess: []
+  updateSuccess: []
 }>()
 
 const handleConfirm = async () => {
   try {
-    var response = await axios.post('https://127.0.0.1:7081/todo', {
+    var response = await axios.patch(`https://127.0.0.1:7081/todo/${props.id}`, {
       title: title.value,
-      description: description.value
+      description: description.value,
+      status: status.value
     }, 
     {
         headers: { 'Authorization': `Bearer ${authState.value.accessToken}` }
     })
-    console.log(`Create ToDo result: ${JSON.stringify(response.data)}`)
-    emit('createSuccess')
-    createFailed.value = false
+    console.log(`Update ToDo result: ${JSON.stringify(response.data)}`)
+    emit('updateSuccess')
+    updateFailed.value = false
     isOpen.value = false
   } catch (err) {
       if (axios.isAxiosError(err)) {
@@ -39,12 +60,12 @@ const handleConfirm = async () => {
       } else {
           console.error('Create ToDo failed, non-axios:', err);
       }
-      createFailed.value = true;
+      updateFailed.value = true;
   }
 }
 
 const handleCancel = () => {
-  createFailed.value = false;
+  updateFailed.value = false;
   isOpen.value = false;
 }
 </script>
@@ -54,13 +75,18 @@ const handleCancel = () => {
     <div v-if="isOpen" class="modal-backdrop" @click="handleCancel()">
       <div class="modal-content" @click.stop>
         <h3 class="dark-text">Create ToDo</h3>
-        <div v-if="createFailed" class="error-box">
-          <p>Failed to create record</p>
+        <div v-if="updateFailed" class="error-box">
+          <p>Failed to update record</p>
         </div>
         <p><i class="dark-text">Title</i></p>
         <input v-model="title" placeholder="My ToDo!"/>
         <p><i class="dark-text">Description</i></p>
         <textarea v-model="description" placeholder="All my details!" rows="3"></textarea>
+        <select v-model="status">
+            <option v-for="item in statuses" :key="item.id" :value="item.value">
+                {{ item.text }}
+            </option>
+        </select>
         
         <div class="modal-actions">
           <BaseButton @click="handleCancel()">Cancel</BaseButton>
