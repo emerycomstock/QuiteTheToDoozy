@@ -1,5 +1,7 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue'
+import Plus from '@primevue/icons/plus'
+import Refresh from '@primevue/icons/refresh'
 import BaseButton from './BaseButton.vue'
 import ToDoItem from './ToDoItem.vue'
 import CreateModal from './CreateModal.vue'
@@ -28,15 +30,15 @@ const openCreateModal = () => {
 }
 
 const refresh = () => {
-
+    
 }
 </script>
 
 <template>
     <div class="wrapper">
         <div class="upper-control-row">
-            <BaseButton @click="refresh()">Refresh</BaseButton>
-            <BaseButton @click="openCreateModal()">Create</BaseButton>
+            <BaseButton @click="refresh()"><Refresh /></BaseButton>
+            <BaseButton @click="openCreateModal()"><Plus /></BaseButton>
         </div>
 
         <div class="content-row-container">

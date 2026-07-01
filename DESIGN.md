@@ -59,10 +59,10 @@ Responses:
 Success response body:
 ```
 {
-    TokenType: "Bearer",
-    AccessToken: <Token>,
-    ExpiresIn: <TimeoutSeconds>,
-    RefreshToken: <Token>
+    tokenType: "Bearer",
+    accessToken: <Token>,
+    expiresIn: <TimeoutSeconds>,
+    refreshToken: <Token>
 }
 ```
 
@@ -73,7 +73,7 @@ Refresh token API, ASP.NET default API.
 Request body:
 ```
 {
-    RefreshToken: <token>
+    refreshToken: <token>
 }
 ```
 
@@ -85,10 +85,10 @@ Responses:
 Success response body:
 ```
 {
-    TokenType: "Bearer",
-    AccessToken: <Token>,
-    ExpiresIn: <TimeoutSeconds>,
-    RefreshToken: <Token>
+    tokenType: "Bearer",
+    accessToken: <Token>,
+    expiresIn: <TimeoutSeconds>,
+    refreshToken: <Token>
 }
 ```
 

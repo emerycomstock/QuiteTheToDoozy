@@ -1,9 +1,14 @@
 <script setup lang="ts">
 import { ref } from 'vue'
+import { userStore } from '@/stores/userStore.ts'
+import { storeToRefs } from 'pinia'
 import ToDoList from './components/ToDoList.vue'
 
 // Control modal visibility
 const isAuthModalOpen = ref(false)
+
+const store = userStore()
+const { authState, errorMessage } = storeToRefs(store)
 
 // Modal open function
 const openAuthModal = () => {
