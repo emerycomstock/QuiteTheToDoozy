@@ -1,5 +1,13 @@
 <script setup lang="ts">
+import { ref } from 'vue'
 import ToDoList from './components/ToDoList.vue'
+
+const isAuthModalOpen = ref(false)
+
+const openAuthModal = () => {
+
+}
+
 </script>
 
 <template>
@@ -17,22 +25,19 @@ import ToDoList from './components/ToDoList.vue'
 <style scoped>
 header {
   line-height: 1.5;
+  display: flex;
+  justify-content: center;
+  align-items: stretch
 }
 
 main {
-  overflow-y: auto;
+  display: flex;
+  flex: 1;
+  align-items: stretch
 }
 
 .logo {
   display: block;
   margin: 0 auto 2rem;
-}
-
-@media (min-width: 1024px) {
-  header {
-    display: flex;
-    place-items: center;
-    padding-right: calc(var(--section-gap) / 2);
-  }
 }
 </style>
